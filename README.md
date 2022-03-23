@@ -4,4 +4,4 @@ Hexadecimal ve Decimal sayılar arasında dönüşüm yapmamızı sağlayan,bit 
 
 
 
-![](Resources\software_prewiev.gif)
+![](Resources/software_prewiev.gif)
