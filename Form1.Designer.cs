@@ -29,6 +29,7 @@ namespace Hex_Dec_Tool
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.label_Hex = new System.Windows.Forms.Label();
             this.label_Dec = new System.Windows.Forms.Label();
@@ -48,6 +49,7 @@ namespace Hex_Dec_Tool
             this.button_reset = new System.Windows.Forms.Button();
             this.button_move = new System.Windows.Forms.Button();
             this.button_close = new System.Windows.Forms.Button();
+            this.timer_resizer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // label_Hex
@@ -61,7 +63,7 @@ namespace Hex_Dec_Tool
             this.label_Hex.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label_Hex.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MouseDown_Action_MouseDown);
             this.label_Hex.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.label_Hex.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.label_Hex.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             this.label_Hex.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseUp);
             // 
             // label_Dec
@@ -74,7 +76,7 @@ namespace Hex_Dec_Tool
             this.label_Dec.Text = "Dec";
             this.label_Dec.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label_Dec.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.label_Dec.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.label_Dec.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // textBox_Hex
             // 
@@ -88,7 +90,7 @@ namespace Hex_Dec_Tool
             this.textBox_Hex.TextChanged += new System.EventHandler(this.TextBox_Hex_TextChanged);
             this.textBox_Hex.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Only_Hex_KeyPress);
             this.textBox_Hex.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.textBox_Hex.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.textBox_Hex.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // textBox_Dec
             // 
@@ -102,7 +104,7 @@ namespace Hex_Dec_Tool
             this.textBox_Dec.TextChanged += new System.EventHandler(this.TextBox_DEC_TextChanged);
             this.textBox_Dec.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Only_Numeric_KeyPress);
             this.textBox_Dec.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.textBox_Dec.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.textBox_Dec.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_bit7
             // 
@@ -114,9 +116,9 @@ namespace Hex_Dec_Tool
             this.button_bit7.TabIndex = 8;
             this.button_bit7.Text = "0";
             this.button_bit7.UseVisualStyleBackColor = true;
-            this.button_bit7.Click += new System.EventHandler(this.Button_bit7_Click);
+            this.button_bit7.Click += new System.EventHandler(this.Button_bits_Click);
             this.button_bit7.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_bit7.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_bit7.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_bit6
             // 
@@ -128,9 +130,9 @@ namespace Hex_Dec_Tool
             this.button_bit6.TabIndex = 9;
             this.button_bit6.Text = "0";
             this.button_bit6.UseVisualStyleBackColor = true;
-            this.button_bit6.Click += new System.EventHandler(this.Button_bit6_Click);
+            this.button_bit6.Click += new System.EventHandler(this.Button_bits_Click);
             this.button_bit6.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_bit6.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_bit6.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_bit4
             // 
@@ -142,9 +144,9 @@ namespace Hex_Dec_Tool
             this.button_bit4.TabIndex = 10;
             this.button_bit4.Text = "0";
             this.button_bit4.UseVisualStyleBackColor = true;
-            this.button_bit4.Click += new System.EventHandler(this.Button_bit4_Click);
+            this.button_bit4.Click += new System.EventHandler(this.Button_bits_Click);
             this.button_bit4.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_bit4.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_bit4.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_bit1
             // 
@@ -156,9 +158,9 @@ namespace Hex_Dec_Tool
             this.button_bit1.TabIndex = 11;
             this.button_bit1.Text = "0";
             this.button_bit1.UseVisualStyleBackColor = true;
-            this.button_bit1.Click += new System.EventHandler(this.Button_bit1_Click);
+            this.button_bit1.Click += new System.EventHandler(this.Button_bits_Click);
             this.button_bit1.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_bit1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_bit1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_bit0
             // 
@@ -170,9 +172,9 @@ namespace Hex_Dec_Tool
             this.button_bit0.TabIndex = 12;
             this.button_bit0.Text = "0";
             this.button_bit0.UseVisualStyleBackColor = true;
-            this.button_bit0.Click += new System.EventHandler(this.Button_bit0_Click);
+            this.button_bit0.Click += new System.EventHandler(this.Button_bits_Click);
             this.button_bit0.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_bit0.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_bit0.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_bit2
             // 
@@ -184,9 +186,9 @@ namespace Hex_Dec_Tool
             this.button_bit2.TabIndex = 13;
             this.button_bit2.Text = "0";
             this.button_bit2.UseVisualStyleBackColor = true;
-            this.button_bit2.Click += new System.EventHandler(this.Button_bit2_Click);
+            this.button_bit2.Click += new System.EventHandler(this.Button_bits_Click);
             this.button_bit2.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_bit2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_bit2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_bit5
             // 
@@ -198,9 +200,9 @@ namespace Hex_Dec_Tool
             this.button_bit5.TabIndex = 14;
             this.button_bit5.Text = "0";
             this.button_bit5.UseVisualStyleBackColor = true;
-            this.button_bit5.Click += new System.EventHandler(this.Button_bit5_Click);
+            this.button_bit5.Click += new System.EventHandler(this.Button_bits_Click);
             this.button_bit5.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_bit5.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_bit5.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_bit3
             // 
@@ -212,9 +214,9 @@ namespace Hex_Dec_Tool
             this.button_bit3.TabIndex = 15;
             this.button_bit3.Text = "0";
             this.button_bit3.UseVisualStyleBackColor = true;
-            this.button_bit3.Click += new System.EventHandler(this.Button_bit3_Click);
+            this.button_bit3.Click += new System.EventHandler(this.Button_bits_Click);
             this.button_bit3.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_bit3.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_bit3.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_copy_dec
             // 
@@ -232,7 +234,7 @@ namespace Hex_Dec_Tool
             this.button_copy_dec.UseVisualStyleBackColor = false;
             this.button_copy_dec.Click += new System.EventHandler(this.Button_copy_dec_Click);
             this.button_copy_dec.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_copy_dec.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_copy_dec.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_copy_hex
             // 
@@ -250,7 +252,7 @@ namespace Hex_Dec_Tool
             this.button_copy_hex.UseVisualStyleBackColor = false;
             this.button_copy_hex.Click += new System.EventHandler(this.Button_copy_hex_Click);
             this.button_copy_hex.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_copy_hex.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_copy_hex.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_more
             // 
@@ -268,7 +270,7 @@ namespace Hex_Dec_Tool
             this.button_more.UseVisualStyleBackColor = false;
             this.button_more.Click += new System.EventHandler(this.Button_more_Click);
             this.button_more.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_more.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_more.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_reset
             // 
@@ -284,9 +286,9 @@ namespace Hex_Dec_Tool
             this.button_reset.TabIndex = 6;
             this.button_reset.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.button_reset.UseVisualStyleBackColor = false;
-            this.button_reset.Click += new System.EventHandler(this.Button3_Click);
+            this.button_reset.Click += new System.EventHandler(this.Button_reset_Click);
             this.button_reset.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_reset.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_reset.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             // 
             // button_move
             // 
@@ -304,7 +306,7 @@ namespace Hex_Dec_Tool
             this.button_move.UseVisualStyleBackColor = false;
             this.button_move.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MouseDown_Action_MouseDown);
             this.button_move.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_move.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_move.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
             this.button_move.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseUp);
             // 
             // button_close
@@ -323,12 +325,16 @@ namespace Hex_Dec_Tool
             this.button_close.UseVisualStyleBackColor = false;
             this.button_close.Click += new System.EventHandler(this.Button_close_Click);
             this.button_close.MouseLeave += new System.EventHandler(this.Label1_MouseLeave);
-            this.button_close.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Button2_MouseMove);
+            this.button_close.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
+            // 
+            // timer_resizer
+            // 
+            this.timer_resizer.Enabled = true;
+            this.timer_resizer.Tick += new System.EventHandler(this.timer_resizer_Tick);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
             this.ClientSize = new System.Drawing.Size(100, 106);
             this.Controls.Add(this.button_copy_dec);
@@ -352,6 +358,8 @@ namespace Hex_Dec_Tool
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(1750, 800);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Form1";
             this.Opacity = 0.7D;
             this.ShowIcon = false;
@@ -385,6 +393,7 @@ namespace Hex_Dec_Tool
         private System.Windows.Forms.Button button_bit3;
         private System.Windows.Forms.Button button_copy_hex;
         private System.Windows.Forms.Button button_copy_dec;
+        private System.Windows.Forms.Timer timer_resizer;
     }
 }
 

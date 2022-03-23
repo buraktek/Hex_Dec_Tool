@@ -11,7 +11,7 @@ namespace Hex_Dec_Tool
 {
     public partial class Form1 : Form
     {
-        bool mouse_click = false;
+        bool isMouseClicked = false;
         int old_x, old_y;
         bool tamam = false;
         bool bit_islemi = false;
@@ -20,14 +20,92 @@ namespace Hex_Dec_Tool
         public Form1()
         {
             InitializeComponent();
-
             this.Location = new System.Drawing.Point(Hex_Dec_Tool.Properties.Settings.Default.Default_Location_X, Hex_Dec_Tool.Properties.Settings.Default.Default_Location_Y);
             // register the event that is fired after the key press.
             hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
             // register the control + B combination as hot key.
-            hook.RegisterHotKey(Hex_Dec_Tool.ModifierKeys.Control, Keys.B);
+            try
+            {
+                hook.RegisterHotKey(Hex_Dec_Tool.ModifierKeys.Control, Keys.B);
+            }
+            catch
+            {
+                MessageBox.Show("Ctrl + B kısayolu farklı bir uygulamada kullanılmaktadır. Lütfen kısayol tuşunu değiştiriniz.");
+            }
         }
 
+        #region Button Actions
+        private void Button_close_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+
+        private void Button_more_Click(object sender, EventArgs e)
+        {
+            if (bit_islemi)
+            {
+                bit_islemi = false;
+                this.ClientSize = new System.Drawing.Size(100, 85);
+            }
+            else
+            {
+                bit_islemi = true;
+                this.ClientSize = new System.Drawing.Size(100, 107);
+            }
+        }
+
+        private void Button_bits_Click(object sender, EventArgs e)
+        {
+            var button = sender as Button;
+            int bit_value;
+            if (textBox_Hex.Text == "")
+                textBox_Hex.Text = "0";
+
+            if (button.Text == "0")
+            {
+                this.Controls[button.Name].Text = "1";
+                if (int.TryParse(button.Name.Substring(button.Name.Length - 1, 1), out bit_value))
+                {
+                    textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) | (byte)(0x01 << bit_value)).ToString("X");
+                }
+            }
+            else
+            {
+                this.Controls[button.Name].Text = "0";
+                if (int.TryParse(button.Name.Substring(button.Name.Length - 1, 1), out bit_value))
+                {
+                    textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) & ~(0x01 << bit_value)).ToString("X");
+                }
+            }
+            label_Dec.Focus();  //Buton seçili kalmaması için eklenmiştir.
+        }
+
+
+        private void Button_copy_hex_Click(object sender, EventArgs e)
+        {
+            if (textBox_Hex.TextLength > 0)
+                Clipboard.SetText(textBox_Hex.Text);
+        }
+
+        private void Button_copy_dec_Click(object sender, EventArgs e)
+        {
+            if (textBox_Hex.TextLength > 0)
+                Clipboard.SetText(textBox_Dec.Text);
+        }
+        private void Button_reset_Click(object sender, EventArgs e)
+        {
+            textBox_Dec.Text = "";
+            textBox_Hex.Text = "";
+            for (int i = 0; i < 8; i++)
+                this.Controls["button_bit" + i].Text = "0";
+        }
+
+        #endregion Button Actions
+
+        #region Other Actions
+
+        #region Keys
         void hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
             try
@@ -43,21 +121,52 @@ namespace Hex_Dec_Tool
             {
             }
         }
-
-        private void Button_close_Click(object sender, EventArgs e)
+        private void Only_Numeric_KeyPress(object sender, KeyPressEventArgs e)
         {
-            Close();
+            // Verify that the pressed key isn't CTRL or any non-numeric digit
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar == '.'))
+            {
+                e.Handled = true;
+            }
         }
 
+        private void Only_Hex_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (((e.KeyChar) == 'A') || (e.KeyChar == 'B') || (e.KeyChar == 'C') || (e.KeyChar == 'D') || (e.KeyChar == 'E') || (e.KeyChar == 'F'))
+            {
+                return;
+            }
+            if (((e.KeyChar) == 'a') || (e.KeyChar == 'b') || (e.KeyChar == 'c') || (e.KeyChar == 'd') || (e.KeyChar == 'e') || (e.KeyChar == 'f'))
+            {
+                return;
+            }
+            if ((e.KeyChar == '+') || (e.KeyChar == '-'))
+            {
+                return;
+            }
+            if (e.KeyChar == (char)13)
+            {
+                textBox_Hex.Text = (Convert.ToInt64(textBox_Dec.Text)).ToString("X2");
+                return;
+            }
+
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+        }
+
+        #endregion Keys
+
+        #region Mouse
         private void MouseDown_Action_MouseDown(object sender, MouseEventArgs e)
         {
-            mouse_click = true;
+            isMouseClicked = true;
             button_move.Cursor = Cursors.SizeAll; //SizeAll yapmamımızın amacı taşırken hoş görüntü olması içindir
         }
-
-        private void Button2_MouseMove(object sender, MouseEventArgs e)
+        private void Form_MouseMove(object sender, MouseEventArgs e)
         {
-            if (mouse_click)
+            if (isMouseClicked)
             {
                 int x, y;
                 int eski_x, eski_y;
@@ -78,86 +187,23 @@ namespace Hex_Dec_Tool
                     }
                 }
             }
-            try
-            {
-                Opacity = 1;
-            }
-            catch
-            {
-
-            }
+            Set_Opacity_For_Main_Window(1);
         }
-
-        private void Hex_To_Bit()
+        private void Label1_MouseLeave(object sender, EventArgs e)
         {
-            long hex = Convert.ToInt64(textBox_Hex.Text, 16);
-            if ((hex & (0x00000001)) == 0x01)
-            {
-                button_bit0.Text = "1";
-            }
-            else
-            {
-                button_bit0.Text = "0";
-            }
-            if ((hex & (0x00000002)) == 0x02)
-            {
-                button_bit1.Text = "1";
-            }
-            else
-            {
-                button_bit1.Text = "0";
-            }
-            if ((hex & (0x00000004)) == 0x04)
-            {
-                button_bit2.Text = "1";
-            }
-            else
-            {
-                button_bit2.Text = "0";
-            }
-            if ((hex & (0x00000008)) == 0x08)
-            {
-                button_bit3.Text = "1";
-            }
-            else
-            {
-                button_bit3.Text = "0";
-            }
-
-            if ((hex & (0x00000010)) == 0x10)
-            {
-                button_bit4.Text = "1";
-            }
-            else
-            {
-                button_bit4.Text = "0";
-            }
-            if ((hex & (0x00000020)) == 0x20)
-            {
-                button_bit5.Text = "1";
-            }
-            else
-            {
-                button_bit5.Text = "0";
-            }
-            if ((hex & (0x00000040)) == 0x40)
-            {
-                button_bit6.Text = "1";
-            }
-            else
-            {
-                button_bit6.Text = "0";
-            }
-            if ((hex & (0x00000080)) == 0x80)
-            {
-                button_bit7.Text = "1";
-            }
-            else
-            {
-                button_bit7.Text = "0";
-            }
-
+            Set_Opacity_For_Main_Window(0.75);
         }
+        private void Label1_MouseMove(object sender, MouseEventArgs e)
+        {
+            Set_Opacity_For_Main_Window(1);
+        }
+        private void Button2_MouseUp(object sender, MouseEventArgs e)
+        {
+            isMouseClicked = false;
+        }
+
+        #endregion Mouse
+
         private void TextBox_Hex_TextChanged(object sender, EventArgs e)
         {
             if ((textBox_Hex.TextLength > 0) && (tamam == false))
@@ -257,6 +303,89 @@ namespace Hex_Dec_Tool
                 textBox_Hex.Text = "";
             tamam = false;
         }
+        private void NotifyIcon1_MouseClick(object sender, MouseEventArgs e)
+        {
+            this.Location = new System.Drawing.Point(1024, 800);
+            Hex_Dec_Tool.Properties.Settings.Default.Default_Location_X = Location.X;
+            Hex_Dec_Tool.Properties.Settings.Default.Default_Location_Y = Location.Y;
+            Hex_Dec_Tool.Properties.Settings.Default.Save();
+            this.TopMost = false;   //Uygulamanın TopMost özelliği true olarak kalsa da zamanla üzerine farklı uygulamalar gelebiliyor.
+            this.TopMost = true;    //Görev çubuğunda bulunan uygulama simgesine basıldığında bu özelliği tekrarlayarak en üstte görünmesini sağlar
+
+        }
+
+        #endregion Other Actions
+
+        private void Hex_To_Bit()
+        {
+            long hex = Convert.ToInt64(textBox_Hex.Text, 16);
+            if ((hex & (0x00000001)) == 0x01)
+            {
+                button_bit0.Text = "1";
+            }
+            else
+            {
+                button_bit0.Text = "0";
+            }
+            if ((hex & (0x00000002)) == 0x02)
+            {
+                button_bit1.Text = "1";
+            }
+            else
+            {
+                button_bit1.Text = "0";
+            }
+            if ((hex & (0x00000004)) == 0x04)
+            {
+                button_bit2.Text = "1";
+            }
+            else
+            {
+                button_bit2.Text = "0";
+            }
+            if ((hex & (0x00000008)) == 0x08)
+            {
+                button_bit3.Text = "1";
+            }
+            else
+            {
+                button_bit3.Text = "0";
+            }
+
+            if ((hex & (0x00000010)) == 0x10)
+            {
+                button_bit4.Text = "1";
+            }
+            else
+            {
+                button_bit4.Text = "0";
+            }
+            if ((hex & (0x00000020)) == 0x20)
+            {
+                button_bit5.Text = "1";
+            }
+            else
+            {
+                button_bit5.Text = "0";
+            }
+            if ((hex & (0x00000040)) == 0x40)
+            {
+                button_bit6.Text = "1";
+            }
+            else
+            {
+                button_bit6.Text = "0";
+            }
+            if ((hex & (0x00000080)) == 0x80)
+            {
+                button_bit7.Text = "1";
+            }
+            else
+            {
+                button_bit7.Text = "0";
+            }
+
+        }
 
         static class HexStringConverter
         {
@@ -278,60 +407,18 @@ namespace Hex_Dec_Tool
             }
         }
 
-        private void Only_Numeric_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            // Verify that the pressed key isn't CTRL or any non-numeric digit
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar == '.'))
-            {
-                e.Handled = true;
-            }
+        private void timer_resizer_Tick(object sender, EventArgs e)
+        {   //Kod yada tasarım tarafında size'ı değiştirecek bir durum olmadığı halde açılışta form ayarlı değerden büyük geliyor.
+            //Çözüm olarak bu timer 1 kerelik çalışarak istenilen size'ı ayarlayarak kapanıyor.
+            timer_resizer.Enabled = false;
+            this.ClientSize = new System.Drawing.Size(100, 85);
         }
 
-        private void Only_Hex_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (((e.KeyChar) == 'A') || (e.KeyChar == 'B') || (e.KeyChar == 'C') || (e.KeyChar == 'D') || (e.KeyChar == 'E') || (e.KeyChar == 'F'))
-            {
-                return;
-            }
-            if (((e.KeyChar) == 'a') || (e.KeyChar == 'b') || (e.KeyChar == 'c') || (e.KeyChar == 'd') || (e.KeyChar == 'e') || (e.KeyChar == 'f'))
-            {
-                return;
-            }
-            if ((e.KeyChar == '+') || (e.KeyChar == '-'))
-            {
-                return;
-            }
-            if (e.KeyChar == (char)13)
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Dec.Text)).ToString("X2");
-                return;
-            }
-
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void Button3_Click(object sender, EventArgs e)
-        {
-            textBox_Dec.Text = "";
-            textBox_Hex.Text = "";
-            button_bit0.Text = "0";
-            button_bit1.Text = "0";
-            button_bit2.Text = "0";
-            button_bit3.Text = "0";
-            button_bit4.Text = "0";
-            button_bit5.Text = "0";
-            button_bit6.Text = "0";
-            button_bit7.Text = "0";
-        }
-
-        private void Label1_MouseLeave(object sender, EventArgs e)
+        private void Set_Opacity_For_Main_Window(double i)
         {
             try
             {
-                Opacity = 0.75;
+                Opacity = i;
             }
             catch
             {
@@ -339,199 +426,6 @@ namespace Hex_Dec_Tool
             }
         }
 
-        private void Label1_MouseMove(object sender, MouseEventArgs e)
-        {
-            try
-            {
-                Opacity = 1;
-            }
-            catch
-            {
-
-            }
-        }
-
-
-        private void Button_more_Click(object sender, EventArgs e)
-        {
-            if (bit_islemi)
-            {
-                bit_islemi = false;
-                this.ClientSize = new System.Drawing.Size(100, 85);
-            }
-            else
-            {
-                bit_islemi = true;
-                this.ClientSize = new System.Drawing.Size(100, 107);
-
-            }
-        }
-
-        #region Bit işlemleri
-
-        private void Button_bit0_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.Text == "")
-                textBox_Hex.Text = "0";
-            if (button_bit0.Text == "0")
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) | 0x01).ToString("X");
-                button_bit0.Text = "1";
-            }
-            else
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) & ~(0x01)).ToString("X");
-                button_bit0.Text = "0";
-            }
-            label_Hex.Select();
-        }
-
-        private void Button_bit1_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.Text == "")
-                textBox_Hex.Text = "0";
-            if (button_bit1.Text == "0")
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) | 0x02).ToString("X");
-                button_bit1.Text = "1";
-            }
-            else
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) & ~(0x02)).ToString("X");
-                button_bit1.Text = "0";
-            }
-            label_Hex.Select();
-        }
-        private void Button_bit2_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.Text == "")
-                textBox_Hex.Text = "0";
-            if (button_bit2.Text == "0")
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) | 0x04).ToString("X");
-                button_bit2.Text = "1";
-            }
-            else
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) & ~(0x04)).ToString("X");
-                button_bit2.Text = "0";
-            }
-            label_Hex.Select();
-        }
-
-        private void Button_bit3_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.Text == "")
-                textBox_Hex.Text = "0";
-            if (button_bit3.Text == "0")
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) | 0x08).ToString("X");
-                button_bit3.Text = "1";
-            }
-            else
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) & ~(0x08)).ToString("X");
-                button_bit3.Text = "0";
-            }
-            label_Hex.Select();
-
-        }
-
-        private void Button_bit4_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.Text == "")
-                textBox_Hex.Text = "0";
-            if (button_bit4.Text == "0")
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) | 0x10).ToString("X");
-                button_bit4.Text = "1";
-            }
-            else
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) & ~(0x10)).ToString("X");
-                button_bit4.Text = "0";
-            }
-            label_Hex.Select();
-        }
-
-        private void Button_bit5_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.Text == "")
-                textBox_Hex.Text = "0";
-            if (button_bit5.Text == "0")
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) | 0x20).ToString("X");
-                button_bit5.Text = "1";
-            }
-            else
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) & ~(0x20)).ToString("X");
-                button_bit5.Text = "0";
-            }
-            label_Hex.Select();
-        }
-
-        private void Button_bit6_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.Text == "")
-                textBox_Hex.Text = "0";
-            if (button_bit6.Text == "0")
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) | 0x40).ToString("X");
-                button_bit6.Text = "1";
-            }
-            else
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) & ~(0x40)).ToString("X");
-                button_bit6.Text = "0";
-            }
-            label_Hex.Select();
-        }
-
-        private void Button_bit7_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.Text == "")
-                textBox_Hex.Text = "0";
-            if (button_bit7.Text == "0")
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) | 0x80).ToString("X");
-                button_bit7.Text = "1";
-            }
-            else
-            {
-                textBox_Hex.Text = (Convert.ToInt64(textBox_Hex.Text, 16) & ~(0x80)).ToString("X");
-                button_bit7.Text = "0";
-            }
-            label_Hex.Select();
-        }
-
-        #endregion Bit işlemleri
-        private void Button_copy_hex_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.TextLength > 0)
-                Clipboard.SetText(textBox_Hex.Text);
-        }
-
-        private void Button_copy_dec_Click(object sender, EventArgs e)
-        {
-            if (textBox_Hex.TextLength > 0)
-                Clipboard.SetText(textBox_Dec.Text);
-        }
-
-        private void NotifyIcon1_MouseClick(object sender, MouseEventArgs e)
-        {
-            this.Location = new System.Drawing.Point(1024, 800);
-            Hex_Dec_Tool.Properties.Settings.Default.Default_Location_X = Location.X;
-            Hex_Dec_Tool.Properties.Settings.Default.Default_Location_Y = Location.Y;
-            Hex_Dec_Tool.Properties.Settings.Default.Save();
-            this.TopMost = false;
-            this.TopMost = true;
-        }
-
-        private void Button2_MouseUp(object sender, MouseEventArgs e)
-        {
-            mouse_click = false;
-        }
     }
 
     #region KeyboardHook
